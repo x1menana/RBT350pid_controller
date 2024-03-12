@@ -2,10 +2,14 @@
 #include "C610Bus.h"
 #include "HandsOn2Util.hpp"
 
+//https://prod.liveshare.vsengsaas.visualstudio.com/join?A3E687F855E26BACD8C4335476A866EDD602
+
 long last_command = 0; // To keep track of when we last commanded the motors
 C610Bus<CAN2> bus;     // Initialize the Teensy's CAN bus to talk to the motors
 
 const int LOOP_DELAY_MILLIS = 5; // Wait for 0.005s between motor updates.
+
+float prevError = -1;
 
 // Implement your own PD controller here.
 float pd_control(float pos,
@@ -14,7 +18,19 @@ float pd_control(float pos,
                  float Kp,
                  float Kd)
 {
-  return 0.0; // YOUR CODE HERE
+  float currError = target - pos;
+
+  float returnVal = 0;
+  if(prevError == -1) { // first iteration with no previous error
+    returnVal = Kp * currError;
+  }
+  else {
+    float errorDiff = currError - prevError;
+    returnVal = Kp * currError + Kd * errorDiff;
+  }
+
+  prevError = currError;
+  return returnVal;
 }
 
 /* Sanitize current command to make it safer.
