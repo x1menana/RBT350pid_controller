@@ -21,15 +21,17 @@ float pd_control(float pos,
   float currError = target - pos;
 
   float returnVal = 0;
-  if(prevError == -1) { // first iteration with no previous error
+  if (prevError == -1) { // first iteration with no previous error
     returnVal = Kp * currError;
-  }
-  else {
+  } else {
     float errorDiff = currError - prevError;
     returnVal = Kp * currError + Kd * errorDiff;
   }
-
   prevError = currError;
+
+  // if(returnVal < -2000) returnVal = -2000;
+  // else if(returnVal > 2000) returnVal = 2000;
+
   return returnVal;
 }
 
@@ -90,10 +92,16 @@ void loop()
     float m0_current = 0.0;
 
     // Your PD controller is run here.
-    float Kp = 1000.0;
-    float Kd = 0;
+    float Kp = 350.0;
+    float Kd = 100.0;
     float target_position = 0.0; // modify in step 8
     m0_current = pd_control(m0_pos, m0_vel, target_position, Kp, Kd);
+
+    Serial.println(Kp);// 2 with 100 // 1.58 seconds with 0
+    Serial.print("    ");
+    Serial.print(Kd);// 2 with 100 // 1.58 seconds with 0
+
+    // underdamped when kp = 1000 and kd = 0
 
     // Uncomment for bang-bang control
     // if(m0_pos < 0) {
@@ -104,6 +112,9 @@ void loop()
 
     // Sanitizes your computed current commands to make the robot safer.
     sanitize_current_command(m0_current, m0_pos, m0_vel);
+
+    Serial.print("\n of m0_current: ");
+    Serial.println(m0_current);// 2 with 100 // 1.58 seconds with 0
 
     // Only call CommandTorques once per loop! Calling it multiple times will override the last command.
     bus.CommandTorques(m0_current, 0, 0, 0, C610Subbus::kIDZeroToThree);
