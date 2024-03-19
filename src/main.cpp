@@ -19,7 +19,7 @@ float pd_control(float pos,
                  float Kd)
 {
   float currError = target - pos;
-  float errorDiff = (currError - prevError)/0.005;
+  float errorDiff = (currError - prevError) / 0.005;
   float returnVal = Kp * currError + Kd * errorDiff;
   prevError = currError;
 
@@ -86,8 +86,8 @@ void loop()
     float m0_current = 0.0;
 
     // Your PD controller is run here.
-    float Kp = 800.0;
-    float Kd = 0.0;
+    float Kp = 1000.0;
+    float Kd = 150.0;
     float target_position = 0.0; // modify in step 8
     m0_current = pd_control(m0_pos, m0_vel, target_position, Kp, Kd);
 
