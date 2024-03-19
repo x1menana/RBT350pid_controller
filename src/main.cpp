@@ -9,7 +9,7 @@ C610Bus<CAN2> bus;     // Initialize the Teensy's CAN bus to talk to the motors
 
 const int LOOP_DELAY_MILLIS = 5; // Wait for 0.005s between motor updates.
 
-float prevError = -1;
+float prevError = 0;
 
 // Implement your own PD controller here.
 float pd_control(float pos,
@@ -19,14 +19,8 @@ float pd_control(float pos,
                  float Kd)
 {
   float currError = target - pos;
-
-  float returnVal = 0;
-  if (prevError == -1) { // first iteration with no previous error
-    returnVal = Kp * currError;
-  } else {
-    float errorDiff = currError - prevError;
-    returnVal = Kp * currError + Kd * errorDiff;
-  }
+  float errorDiff = (currError - prevError)/0.005;
+  float returnVal = Kp * currError + Kd * errorDiff;
   prevError = currError;
 
   // if(returnVal < -2000) returnVal = -2000;
@@ -92,8 +86,8 @@ void loop()
     float m0_current = 0.0;
 
     // Your PD controller is run here.
-    float Kp = 350.0;
-    float Kd = 100.0;
+    float Kp = 800.0;
+    float Kd = 0.0;
     float target_position = 0.0; // modify in step 8
     m0_current = pd_control(m0_pos, m0_vel, target_position, Kp, Kd);
 
